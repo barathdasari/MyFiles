@@ -1,0 +1,140 @@
+Here is the comprehensive blueprint and architecture document. It is designed to be copied directly into a .md, .docx, or .txt file for your AI engineering and product teams.
+
+It translates your manual Travel Pass analysis—including the specific data joins, funnel drop-off points, and QA guardrails you discovered—into a repeatable, agentic pipeline.
+
+---
+
+Intent × Friction Agentic Analysis Framework
+
+Blueprint & Semantic Solution Model
+
+1. THE "WHAT" — Framework Definition & Objectives
+
+1.1 Core Objective
+
+To transition the manual, multi-phase Intent × Friction analysis (as executed for the "Travel Pass" L2) into a scalable, automated, and repeatable agentic pipeline. The framework must ingest raw data, map digital journeys, identify friction points, size the deflection opportunity, and generate executive-ready outputs for any L2 intent (e.g., "Add International Plan," "International Text") without requiring weeks of manual data science effort.
+
+1.2 Key Deliverables
+
+· Unified Intent × Friction Matrix: Automated mapping of L1 → L2 → Digital Friction Signal → Care Call Reason.
+· Deflection Sizing Model: Quantified call volume, CIR (Call Interaction Rate), and estimated financial savings per friction point.
+· QA & Guardrail Report: Bias-adjusted insights (accounting for automated updates, tenure, and longitudinal trends).
+· Actionable Backlog: Jira-formatted tickets for UX, Engineering, and Product teams.
+· Executive Summary: A standardized narrative (matching your Travel Pass format) highlighting the top drop-off points and proposed fixes.
+
+---
+
+2. THE "WHY" — Business Case & Rationale
+
+2.1 Current State (Manual)
+
+· High Effort: Requires cross-repository SQL joins (cwlsdo-0, vzdsdw-0, cdwldo-0), field mapping (page_name to page_nm, omni_hit_join_vcg), and manual funnel mapping (itp_destinationselection → itp_confirmation).
+· High Cognitive Load: Requires manually identifying drop-offs (e.g., the 55% loss from itp_deviceandplansselection to itp_planselection), correlating with 21K monthly calls, and manually applying QA guardrails (e.g., 30-day windows, tenure adjustments).
+· Lack of Scalability: Replicating this for every L2 intent is impossible without exponential headcount.
+
+2.2 Future State (Agentic)
+
+· Speed: Reduces analysis time from weeks to hours.
+· Consistency: Applies the exact same mathematical and QA guardrails to every L2 intent.
+· Focus: Offloads data engineering, transcript mining, and report generation to agents, allowing human analysts to focus purely on business rules, root-cause validation, and product strategy.
+
+---
+
+3. THE "HOW" — Architecture & Semantic Solution Model
+
+3.1 The Semantic Layer (Unified Data Model)
+
+To allow agents to work across disparate systems, raw data must be mapped to a unified semantic schema.
+
+Core Entities:
+
+· Intent: L1_Intent (e.g., International), L2_Intent (e.g., Travel Pass, Add International Plan).
+· Digital Journey: Session_ID, User_ID, Journey_Stage (e.g., itp_deviceandplansselection), Time_Stamp.
+· Friction Signal: Friction_Type (e.g., Home Return Pattern, Multi-Flow Entry No Completion, Auth Loop, Rage Click).
+· Care Interaction: Call_ID, Call_Reason (e.g., Bill Dispute, Travel Pass Inquiry), CIR (Call Interaction Rate).
+· User Profile: Tenure (e.g., New vs. 3+ Years), Plan_Type, Historical_Usage.
+
+Semantic Mapping Rules:
+
+· page_name → page_nm
+· omni_hit_join_vcg must be applied to join digital sessions with intent signals.
+· Data from cwlsdo-0 (digital session metrics), vzdsdw-0 (intent signals), and cdwldo-0 (conversation records) must be joined on Session_ID or User_ID + Time_Window.
+
+3.2 Agentic Architecture (The Agents)
+
+The pipeline is managed by an Orchestrator Agent, which triggers specialized sub-agents based on the target L2 intent.
+
+Agent Name Role Input Output
+Orchestrator Manages pipeline execution, handoffs, and human-in-the-loop gates. Target L2 Intent (e.g., "Add Int'l Plan"). Completed Executive Summary + Jira Tickets.
+Data Connector Handles cross-repo joins, field mapping, and PII redaction. Raw tables (cwlsdo-0, etc.), L2 Intent. Unified Journey Dataset.
+Journey Mapper Maps the expected digital flow (e.g., international_dashboard to itp_confirmation). Unified Dataset, L2 Intent. Visual Funnel Map + Deviation Log.
+Funnel Analyst Calculates drop-off rates between steps and flags major leaks. Visual Funnel Map, Call Volume Data. Friction List (e.g., 55% drop-off at itp_planselection).
+Call Miner Transcribes, summarizes, and classifies care call reasons. Care Call Transcripts, Friction List. Root Cause Mapping (e.g., Bill Dispute linked to Plan Selection).
+Segmentation Segments callers by tenure, repeat contact, and plan type. Care Call Data, User Profiles. Caller Persona Profiles.
+Data QA Critical Guardrail: Adjusts time windows, checks for automated updates, validates longitudinal trends. Historical Data, Trend Data. Bias-Free, Validated Findings.
+Sizing Calculates deflection opportunity (Volume × CIR × Cost/Call). Validated Findings. Prioritized Deflection Opportunity Matrix.
+Insight Writer Generates the Executive Summary and Jira tickets. Validated Findings, Sizing. Exec Summary (Phase 1-5 format) + Backlog.
+
+3.3 The Agentic Workflow (Execution Pipeline)
+
+Phase 1: Ingestion & Mapping
+
+1. Orchestrator receives L2_Intent = "Travel Pass".
+2. Data Connector joins cwlsdo-0, vzdsdw-0, cdwldo-0. Swaps page_name to page_nm. Applies omni_hit_join_vcg.
+3. Journey Mapper outputs the standard flow: international_dashboard → itp_destinationselection → itp_traveledates → itp_deviceandplansselection → itp_planselection → itp_effectivedate → itp_skipnewplan → itp_confirmation.
+
+Phase 2: Friction & Impact Detection
+
+4. Funnel Analyst calculates drop-offs. Identifies the 55% loss from itp_deviceandplansselection (121K) to itp_planselection (55K).
+5. Funnel Analyst correlates this drop-off with 21K monthly calls for "Add Travel Pass".
+
+Phase 3: Root Cause & Segmentation
+
+6. Call Miner mines the 21K transcripts. Tags them to "Bill Dispute", "Inquiry", etc.
+7. Segmentation Agent breaks down callers by tenure (New vs. 3+ years) and repeat contact trends.
+
+Phase 4: QA & Guardrails (Your Phase 5)
+
+8. Data QA Agent applies the exact analytical guardrails you developed:
+   · Automated Updates: Adjusts to 30-day window (72% to 45% trend).
+   · Longitudinal: Checks 3-month trends (Sessions +14%, Unique Users -25%).
+   · Historical Usage: Narrows to trailing 12-month window.
+   · Tenure Bias: Validates that 74% of intent comes from 3+ year accounts, but notes new users self-serve at half the rate (4% vs 11%).
+
+Phase 5: Output Generation
+
+9. Sizing Agent calculates the Deflection Opportunity (Call Volume × CIR × Cost per Call).
+10. Insight Writer Agent drafts the Executive Summary and generates Jira tickets for the UX/Product teams.
+
+3.4 Agent Prompt Library (Ready to Deploy)
+
+Prompt for the Data QA Agent (Phase 4 Guardrails):
+
+"Evaluate the Travel Pass CIR data for the last 30, 90, and 365 days. Check for automated account updates (e.g., mid-summer fluctuations) that might skew CIR trends. Adjust the primary analysis window to 30 days to exclude these automated updates. Break down the self-service completion rate by account tenure (New vs. 3+ years). Flag any discrepancies where new users complete self-service at a significantly lower rate than established users (e.g., 4% vs 11%). Validate the 3-month longitudinal trend (Sessions +14%, Unique Users -25%)."
+
+Prompt for the Insight Writer Agent (Output Generation):
+
+"Draft an Executive Summary for the 'Add International Plan' friction analysis, modeled exactly on the Travel Pass Executive Summary format. Include the mapped digital funnel, the specific drop-off point (e.g., 55% loss from itp_deviceandplansselection to itp_planselection), and the 21K monthly call volume. Incorporate the QA Guardrail findings (30-day window adjustment, tenure breakdown) into the findings. Conclude with a prioritized list of Jira tickets for the top 3 friction points."
+
+---
+
+4. IMPLEMENTATION ROADMAP
+
+1. Step 1: Semantic Layer Setup: Map the data dictionaries from cwlsdo-0, vzdsdw-0, and cdwldo-0 into the Unified Data Model.
+2. Step 2: Agent Development: Build the Data Connector, Journey Mapper, and Funnel Analyst agents first (this handles the heavy data engineering).
+3. Step 3: QA Guardrail Integration: Encode your Phase 5 business rules (30-day window, tenure filters) into the Data QA Agent. This is the most critical step for accuracy.
+4. Step 4: Pilot: Run the pipeline for "Travel Pass" to validate that the agentic output matches your manual analysis.
+5. Step 5: Scale: Trigger the pipeline for "Add International Plan," "International Text," and other L2 intents under the International L1.
+
+5. HUMAN-IN-THE-LOOP GOVERNANCE
+
+To ensure accuracy and business alignment, humans must approve the following:
+
+· Taxonomy Updates: Approving new friction signals or L2 intents.
+· Root Cause Validation: Reading the Call Miner's findings and confirming the "Why".
+· QA Override: Reviewing cases where automated updates significantly skew the data.
+· Jira Ticket Approval: Final sign-off on the proposed digital fixes.
+
+---
+
+End of Blueprint
